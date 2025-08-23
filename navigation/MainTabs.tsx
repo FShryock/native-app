@@ -33,7 +33,7 @@ export default function MainTabs(props: MainTabsProps) {
           else iconName = "people-outline";
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007aff',    // active icon color
+        tabBarActiveTintColor: '#ff5722',    // active icon color
         tabBarInactiveTintColor: '#f7f7f7',     // inactive icon color
         tabBarStyle: {
         backgroundColor: '#181818',        // tab bar background color
@@ -43,12 +43,12 @@ export default function MainTabs(props: MainTabsProps) {
         headerTitleAlign: "left",
         // headerStyle: { backgroundColor: "#f7f7f7" },
         headerStyle: { backgroundColor: "#181818" },
-        headerTintColor: "#fecd52",
+        headerTintColor: "#ff5722",
         // Add your top-right buttons back
         headerRight: () => (
           <View style={{ flexDirection: "row", gap: 15, marginRight: 10 }}>
             <TouchableOpacity onPress={() => props.handleLogin(false)}>
-              <Ionicons name="log-out-outline" size={24} color="#fecd52" />
+              <Ionicons name="log-out-outline" size={24} color="#ff5722" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => console.log("Action 1")}>
               <Ionicons name="notifications-outline" size={24} color="#f7f7f7" />
