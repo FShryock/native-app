@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainTabParamList } from '../navigation/MainTabs';
 import TournamentCard from '../components/TournamentCard';
@@ -8,8 +8,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 type Props = NativeStackScreenProps<MainTabParamList, 'Tournament'>;
 
-export default function TournamentScreen({ navigation }: Props) {
-  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+export default function TournamentScreen(props: Props) {
+  const [tournaments, setTournaments] = useState<Array<Tournament>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,20 +25,15 @@ export default function TournamentScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-     <ScrollView style={{ padding: 0 }}>
-      {
-        tournaments.map((tourney) => {
-          return <TournamentCard key={tourney.id} tournament={tourney} />
-        })
-      }
+      <ScrollView style={{ padding: 0 }}>
+        {
+          tournaments.map((tourney) => {
+            return <TournamentCard key={tourney.id} tournament={tourney} />
+          })
+        }
 
-    </ScrollView>
-
-
-    {/* //   <Text>Tournament Screen</Text>
-    //   <Button title="Go to Home" onPress={() => navigation.navigate('Home')} /> */}
+      </ScrollView>
     </View>
-    // <ScrollView style={styles.container}>
    
   );
 }
@@ -46,8 +41,6 @@ export default function TournamentScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#1C1D21',
     color: '#f7f7f7'
   }

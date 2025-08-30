@@ -4,7 +4,15 @@ export interface Tournament {
     id: number, 
     name: string,
     date: string,
-    location: string
+    location: string,
+    format: string, 
+    gender: string,
+    level: string,
+    status: string,
+    surface: string,
+    registration_deadline: string,
+    teams_limit: string,
+    prize_pool: string
 }
 // testing from physical device
 // change local host to actual IP address of local front end application
