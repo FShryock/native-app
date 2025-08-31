@@ -1,57 +1,58 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
-// import { NativeStackScreenProps } from '@react-navigation/native-stack';
-// import { MainStackParamList } from '../navigation/MainNavigator';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
+import { getLogin } from '../api/getLogin';
 import logo from '../assets/logo.png';
+import BottomSheetModal from '../components/BottomSheetModal';
+import SignUp from './SignUpScreen';
 
 interface LoginScreenProps {
   handleLogin: (value: boolean) => void
 }
 
 export default function LoginScreen(props: LoginScreenProps) {
-  const [userID, setUserID] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isFocused, setIsFocused] = useState(true);
-  const userIDRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);  
+  const [error, setError] = useState('');
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  const handleLogin = async () => {
+    try{
+      await getLogin(username, password);
+      props.handleLogin(true);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
 
   return (
     <View style={styles.container}>
       {/* Display Logo */}
+      <View style={styles.mainScreen}>
       <Image source={logo} style={styles.logo} resizeMode={'contain'}/>
 
       <Text style={styles.title}>Volley-Connect</Text>
 
 
-        {/* UserId */}
-        <TextInput
-        ref={userIDRef}
-        style={styles.input}
-        placeholder={'User ID'}
-        placeholderTextColor={'#673ab7'}
-        value={userID}
-        onChangeText={setUserID}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        returnKeyType="next"
-        onSubmitEditing={() => passwordRef.current?.focus()}
-        />
+      {/* UserId */}
+      <TextInput
+      style={styles.input}
+      placeholder={'User ID'}
+      placeholderTextColor={'#673ab7'}
+      onChangeText={setUsername}
+      returnKeyType="next"
+      />
 
-        {/* Password */}
-        <TextInput
-        ref={passwordRef}
-        style={styles.input}
-        secureTextEntry={true}  // <-- this makes it a password input
-        placeholder={'Password'}
-        placeholderTextColor={'#673ab7'}
-        value={password}
-        onChangeText={setPassword}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        returnKeyType="done"
-        onSubmitEditing={() => console.log('Submit login')}
-        />
+      {/* Password */}
+      <TextInput
+      style={styles.input}
+      secureTextEntry={true}  // <-- this makes it a password input
+      placeholder={'Password'}
+      placeholderTextColor={'#673ab7'}
+      onChangeText={setPassword}
+      returnKeyType="done"
+      />
      
+     {error ? <Text style={styles.error}>{error}</Text> : null}
 
       {/* Forgot Password */}
       {/* TODO 
@@ -65,18 +66,25 @@ export default function LoginScreen(props: LoginScreenProps) {
       {/* TODO 
         Add logic to handle User login
       */}
-      <TouchableOpacity style={styles.buttonContainer} onPress={() => props.handleLogin(true)}>
+      <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
        {/* Signup link */}
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>Don't have an account?</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => {setIsBottomSheetOpen(true)}}>
           <Text style={styles.signupLink}> Sign up</Text>
         </TouchableOpacity>
       </View>
-                    
+
+      </View>
+        <BottomSheetModal
+          visible={isBottomSheetOpen}
+          onClose={() => setIsBottomSheetOpen(false)}
+        >
+          <SignUp onClose={() => setIsBottomSheetOpen(false)}/>
+        </BottomSheetModal>
     </View>
     
   );
@@ -86,6 +94,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1C1D21',
+    // padding: 20
+  },
+  mainScreen: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20
@@ -112,11 +124,10 @@ const styles = StyleSheet.create({
     borderColor: '#222',
     marginBottom: 20
   },
-  inputFocus: {
-    borderColor: '#FF5722',
-    borderWidth: 2,
-    backgroundColor: '#817f7f',
-
+  error: {
+    color: 'red',
+    marginBottom: 12,
+    textAlign: 'center'
   },
   forgotContainer:{
     alignSelf: 'flex-end',
@@ -137,7 +148,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 8,
     textAlign: 'center',
-    // backgroundColor: '#166088'
     backgroundColor: '#ff5722'
   },
   signupContainer: {
@@ -158,8 +168,3 @@ const styles = StyleSheet.create({
     fontSize: 18
   }
 })
-
-// <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    //   <Text>Login Screen</Text>
-    //   <Button title="Go to Map" onPress={() => navigation.navigate('Map')} />
-    // </View>

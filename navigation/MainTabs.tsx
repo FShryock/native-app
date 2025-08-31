@@ -68,7 +68,7 @@ export default function MainTabs(props: MainTabsProps) {
       />
       <Tab.Screen name="Tournament" component={TournamentScreen} />
       <Tab.Screen name="Teams" component={TeamScreen} />
-      <Tab.Screen name="Map" component={MapScreen} />
+      {/* <Tab.Screen name="Map" component={MapScreen} /> */}
     </Tab.Navigator>
   );
 }
