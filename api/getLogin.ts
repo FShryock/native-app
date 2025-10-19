@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { API_BASE_URL } from '@env';
+import { useState } from 'react';
 
 export async function getLogin(username: string, password: string) {
     const response = await fetch(`${API_BASE_URL}/token/`, {
@@ -13,7 +14,6 @@ export async function getLogin(username: string, password: string) {
     }
 
     const data = await response.json();
-
     await AsyncStorage.setItem('access', data.access);
     await AsyncStorage.setItem('refresh', data.refresh);
 
@@ -24,7 +24,7 @@ export async function refreshToken() {
     const refresh = await AsyncStorage.getItem('refresh');
     if (!refresh) throw new Error('No refresh token found');
 
-    const response = await fetch(`${BASE_URL}/api/token/refresh/`, {
+    const response = await fetch(`${API_BASE_URL }/api/token/refresh/`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ refresh })

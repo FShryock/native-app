@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 interface BottomSheetModalProps {
   visible: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   topGap?: number; // optional top gap
 }
 
