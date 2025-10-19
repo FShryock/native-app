@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { getLogin } from '../api/getLogin';
 import logo from '../assets/logo.png';
 import BottomSheetModal from '../components/BottomSheetModal';
 import SignUp from './SignUpScreen';
+import { useUser } from '../contexts/UserContext';
 
 interface LoginScreenProps {
   handleLogin: (value: boolean) => void
@@ -14,10 +15,12 @@ export default function LoginScreen(props: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const { setUserInfo } = useUser();
 
   const handleLogin = async () => {
     try{
-      await getLogin(username, password);
+      const response = await getLogin(username, password);
+      setUserInfo(response.user)
       props.handleLogin(true);
     } catch (err: any) {
       setError(err.message);
@@ -94,7 +97,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1C1D21',
-    // padding: 20
   },
   mainScreen: {
     flex: 1,

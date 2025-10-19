@@ -66,7 +66,7 @@ export default function MapScreen() {
             </View>
         </Marker>
       </MapView>
-       <TouchableOpacity style={styles.button} onPress={() => console.log('test')}>
+       <TouchableOpacity style={styles.button} onPress={() => console.log('Location test')}>
         <Ionicons name={'navigate-outline'} color={'white'} size={24}/>
       </TouchableOpacity>
      

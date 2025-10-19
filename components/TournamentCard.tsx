@@ -4,7 +4,7 @@ import { Tournament } from '../api/getTournaments'
 import { Ionicons } from "@expo/vector-icons";
 
 interface TournamentCardProps {
-    tournament: Tournament;
+  tournament: Tournament;
 }
 
 export default function TournamentCard(props: TournamentCardProps) {

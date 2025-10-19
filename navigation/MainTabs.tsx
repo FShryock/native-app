@@ -41,7 +41,6 @@ export default function MainTabs(props: MainTabsProps) {
         headerShown: true,
         headerTitle: "Volley-Connect",
         headerTitleAlign: "left",
-        // headerStyle: { backgroundColor: "#f7f7f7" },
         headerStyle: { backgroundColor: "#181818" },
         headerTintColor: "#ff5722",
         // Add your top-right buttons back
@@ -68,7 +67,7 @@ export default function MainTabs(props: MainTabsProps) {
       />
       <Tab.Screen name="Tournament" component={TournamentScreen} />
       <Tab.Screen name="Teams" component={TeamScreen} />
-      {/* <Tab.Screen name="Map" component={MapScreen} /> */}
+      <Tab.Screen name="Map" component={MapScreen} />
     </Tab.Navigator>
   );
 }
