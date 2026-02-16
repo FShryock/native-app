@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheetModal from '../components/BottomSheetModal';
 import MyCalendar from '../components/MyCalendar';
 import { useUser } from "../contexts/UserContext";
+import CreateTourney from './CreateTournamentScreen';
 
 
 // ******************* Props ****************************************
@@ -20,6 +21,7 @@ export default function HomeScreen(props: HomeScreenProps) {
   const [isCaledarOpen, setIsCalendarOpen] = useState(false);
   const [isFavoriteOpen, setIsFavoriteOpen] = useState(false);
   const [isTeamsOpen, setIsTeamsOpen] =  useState(false);
+  const [isAddingOpen, setIsAddingOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const calendarTest = [
@@ -94,6 +96,9 @@ export default function HomeScreen(props: HomeScreenProps) {
           <TouchableOpacity style={styles.button} onPress={() => setIsTeamsOpen(true)} >
             <Ionicons name="people-outline" size={24} color='#fff' />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => setIsAddingOpen(true)} >
+            <Ionicons name="add-circle-outline" size={24} color='#fff' />
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => setIsSettingsOpen(true)} >
             <Ionicons name="settings-outline" size={24} color='#fff' />
           </TouchableOpacity>
@@ -113,6 +118,11 @@ export default function HomeScreen(props: HomeScreenProps) {
             <Text>
               Teams!!
             </Text>
+        </BottomSheetModal>
+        <BottomSheetModal visible={isAddingOpen} onClose={() => setIsAddingOpen(false)}>
+            <View style={styles.calendar}>
+              <CreateTourney/>
+            </View>
         </BottomSheetModal>
         <BottomSheetModal visible={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}>
             <Text>

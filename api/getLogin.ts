@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { API_BASE_URL } from '@env';
-import { useState } from 'react';
 
 export async function getLogin(username: string, password: string) {
     const response = await fetch(`${API_BASE_URL}/token/`, {

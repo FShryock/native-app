@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 type match = {
     id: number,
@@ -16,6 +17,8 @@ type match = {
 
 export default function MatchCard() {
     const [selectedTab, setSelectedTab] = useState('Live');
+    const [gameSelected, setGameSelected] = useState<Record<number, number>>({});
+    const [selectedScore, setSelectedScore] = useState<Record<number, { t1: number; t2: number }>>({});
 
     //test data
     const matches = [
@@ -24,9 +27,9 @@ export default function MatchCard() {
         court: 'Court 3',
         status: 'In Progress',
         statusColor: '#22c55e',
-        team1: { name: 'Spike Squad', score: 21 },
-        team2: { name: 'Block Busters', score: 18 },
-        currentGame: 'Game 1',
+        team1: { name: 'Spike Squad', score: 21, game2Score: 15 },
+        team2: { name: 'Block Busters', score: 18, game2Score: 21 },
+        currentGame: 'Game 2',
         games: ['Game 1', 'Game 2'],
         },
         {
@@ -34,8 +37,8 @@ export default function MatchCard() {
         court: 'Court 1',
         status: 'Starting in 15min',
         statusColor: '#fbbf24',
-        team1: { name: 'Net Ninjas', score: 0 },
-        team2: { name: 'Ace Attackers', score: 0 },
+        team1: { name: 'Net Ninjas', score: 6, game2Score: 0 },
+        team2: { name: 'Ace Attackers', score: 2, game2Score: 0},
         currentGame: 'Game 1',
         games: ['Game 1', 'Game 2'],
         },
@@ -52,13 +55,35 @@ export default function MatchCard() {
         },
     ];
 
-    const renderMatchCard = (match: match) => (
+    const handleSelectedGame = (match: match, id: number, index: number) => {
+        setGameSelected(prev => ({...prev, [id]: index}));
+        displayGameSelectedScores(match, id, index);
+    }
+
+    const displayGameSelectedScores = (match: match, id: number, index: number) => {
+        const t1 = (index === 0 ? match.team1.score : match.team1.game2Score) ?? 0;
+        const t2 = (index === 0 ? match.team2.score : match.team2.game2Score) ?? 0;
+        setSelectedScore(prev => ({...prev, [id]: { t1, t2}}));
+    }
+
+    const renderMatchCard = (match: match) => {
+        const selIndex = gameSelected[match.id] ?? 0;
+        const defaultT1 = ((selIndex === 0 ? match.team1.score : match.team1.game2Score) ?? 0);
+        const defaultT2 = ((selIndex === 0 ? match.team2.score : match.team2.game2Score) ?? 0);
+        const scores = selectedScore[match.id];
+        const displayT1 = scores?.t1 ?? defaultT1;
+        const displayT2 = scores?.t2 ?? defaultT2;
+        return (
         <View key={match.id} style={styles.matchCard}>
             {/* Court and Status Header */}
             <View style={styles.matchHeader}>
                 <Text style={styles.courtText}>{match.court}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: match.statusColor}]}>
                     <Text style={styles.statusText}>{match.status}</Text>
+                </View>
+                {/* <View style={[styles.statusBadge, { backgroundColor: match.statusColor}]}> */}
+                <View style={styles.statusBadge}>
+                    <Ionicons name={'create-outline'} size={25} color={'#fefeffff'} />
                 </View>
             </View>
 
@@ -71,9 +96,9 @@ export default function MatchCard() {
                 </View>
                 {/* Score Display */}
                 <View style={styles.scoreDisplay}>
-                    <Text style={styles.scoreText}>{match.team1.score}</Text>
+                    <Text style={styles.scoreText}>{displayT1}</Text>
                     <Text style={styles.vsText}>vs</Text>
-                    <Text style={styles.scoreText}>{match.team2.score}</Text>
+                    <Text style={styles.scoreText}>{displayT2}</Text>
                 </View>
                  {/* Team2 */}
                 <View style={styles.teamSection}>
@@ -89,33 +114,24 @@ export default function MatchCard() {
                         key={game}
                         style={[
                             styles.gameTab,
-                            index === 0 && styles.gameTabActive,
+                            index === gameSelected[match.id] && styles.gameTabActive,
                         ]}
+                        onPress={() => handleSelectedGame(match, match.id, index)}
                     >
                       <Text
                         style={[
                             styles.gameTabText,
-                            index === 0 && styles.gameTabTextActive,
+                            index === gameSelected[match.id] && styles.gameTabTextActive,
                         ]}
                       >
                         {game}
                       </Text>
                     </TouchableOpacity>
-                ))};
+                ))}
             </View>
-
-            {/* Additional Game Score for Completed Matches */}
-            {match.showMultipleGames && (
-                <View style={styles.additionalScore}>
-                    <Text style={styles.additionalScoreText}>
-                        {match.team1.game2Score} vs {match.team2.game2Score}
-                    </Text>
-                    <Text style={styles.additionalGameLabel}>Game 2</Text>
-                </View>
-            )}
-
         </View>
-    );
+        );
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -171,7 +187,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 20,
-        backgroundColor: '#8851e063',
+        backgroundColor: '#93939363',
     },
     tabActive: {
         backgroundColor: '#ff5722',
