@@ -1,15 +1,9 @@
 import React from 'react';
-import { View, Text, Button } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { MainTabParamList } from '../navigation/MainTabs';
+import MatchCard from '../components/MatchCard';
 
-type Props = NativeStackScreenProps<MainTabParamList, 'Teams'>;
-
-export default function TeamScreen({ navigation }: Props) {
+export default function TeamScreen() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Team Screen</Text>
-      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
-    </View>
+    <MatchCard></MatchCard>
   );
 }
+
