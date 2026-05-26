@@ -49,9 +49,9 @@ export default function MainTabs(props: MainTabsProps) {
             <TouchableOpacity onPress={() => props.handleLogin(false)}>
               <Ionicons name="log-out-outline" size={24} color="#ff5722" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("Action 1")}>
+            {/* <TouchableOpacity onPress={() => console.log("Action 1")}>
               <Ionicons name="notifications-outline" size={24} color="#f7f7f7" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity onPress={() => console.log("Action 2")}>
               <Ionicons name="settings-outline" size={24} color="#f7f7f7" />
             </TouchableOpacity>

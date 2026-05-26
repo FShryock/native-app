@@ -15,12 +15,14 @@ export default function LoginScreen(props: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-  const { setUserInfo } = useUser();
+  const { setUserInfo, setAccessToken } = useUser();
 
   const handleLogin = async () => {
     try{
       const response = await getLogin(username, password);
+      console.log("paco user data: ", response);
       setUserInfo(response.user)
+      setAccessToken(response.access);
       props.handleLogin(true);
     } catch (err: any) {
       setError(err.message);

@@ -2,12 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Tournament } from '../api/getTournaments'
 import { Ionicons } from "@expo/vector-icons";
+import { useUser } from '../contexts/UserContext';
+import { postTournamentRegistration } from '../api/postTournamentRegistration';
 
 interface TournamentCardProps {
   tournament: Tournament;
 }
 
 export default function TournamentCard(props: TournamentCardProps) {
+  const { accessToken } = useUser();
 
   const getStatus = (status: string) => { 
     switch (status) {
@@ -55,6 +58,11 @@ export default function TournamentCard(props: TournamentCardProps) {
   }
 
   const isRegistrationClosed = props.tournament.status === 'closed';
+
+  const submitRegistration = (tournamentId: number) => {
+    console.log("paco info", accessToken)
+    postTournamentRegistration(tournamentId, accessToken);
+  }
 
 
   return(
@@ -108,13 +116,13 @@ export default function TournamentCard(props: TournamentCardProps) {
       </View>
 
       {/* REGISTRATION & DETAILS */}
-      {/* <View style={styles.buttonSection}>
+      <View style={styles.buttonSection}>
           <TouchableOpacity
           style={[
               styles.registerButton,
               isRegistrationClosed && styles.disabledButton
           ]}
-          onPress={() => {console.log("Register function")}}
+          onPress={() => {submitRegistration(props.tournament.id)}}
           disabled={isRegistrationClosed}
           >
           <Text style={[
@@ -125,13 +133,13 @@ export default function TournamentCard(props: TournamentCardProps) {
           </Text>
           </TouchableOpacity>
           
-          <TouchableOpacity
+          {/* <TouchableOpacity
           style={styles.detailsButton}
           onPress={() => {console.log("details function")}}
           >
           <Text style={styles.detailsButtonText}>Details</Text>
-          </TouchableOpacity>
-      </View> */}
+          </TouchableOpacity> */}
+      </View>
 
 
     </View>

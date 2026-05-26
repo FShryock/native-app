@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/MainNavigator';
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheetModal from '../components/BottomSheetModal';
+import CalendarItem from '../components/CalendarItem';
 import MyCalendar from '../components/MyCalendar';
 import { useUser } from "../contexts/UserContext";
 import CreateTourney from './CreateTournamentScreen';
+import { getMyTournaments } from '../api/getMyTournaments';
+import { CalendarItemType } from '../types';
 
 
 // ******************* Props ****************************************
@@ -23,6 +26,7 @@ export default function HomeScreen(props: HomeScreenProps) {
   const [isTeamsOpen, setIsTeamsOpen] =  useState(false);
   const [isAddingOpen, setIsAddingOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [userTournaments, setUserTournaments] = useState<Array<CalendarItemType>>([]);
 
   const calendarTest = [
     {title: 'Smackdown 1', start: '2025-10-05', info: 'This us a vert difficult tournament'},
@@ -30,7 +34,19 @@ export default function HomeScreen(props: HomeScreenProps) {
     {title: 'Smackdown 3', start: '2025-10-25', info: 'This us a vert difficult tournament'},
   ];
 
-  const { userInfo } = useUser();
+  const { userInfo, accessToken } = useUser();
+
+  useEffect(()=> {
+    async function getUserTournaments() {
+      try {
+        const data = await getMyTournaments(accessToken);
+        setUserTournaments(data);
+      } catch (error: any) {
+        console.error("Error: ", error)
+      }
+    }
+    getUserTournaments();
+  }, []);
 
 
 
@@ -55,30 +71,13 @@ export default function HomeScreen(props: HomeScreenProps) {
         
         <Text style={styles.label}>Registered Tournaments!!</Text>
         <ScrollView horizontal style={styles.tournaments} contentContainerStyle={{ alignItems: 'center' }}>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>Beach Bash</Text>
-            <Text style={styles.calendarDate}>Jan 5</Text>
-          </View>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>BoomTown</Text>
-            <Text style={styles.calendarDate}>May 15</Text>
-          </View>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>SmackDown</Text>
-            <Text style={styles.calendarDate}>Oct 3</Text>
-          </View>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>Last Dig</Text>
-            <Text style={styles.calendarDate}>Aug 8</Text>
-          </View>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>Dig or Die</Text>
-            <Text style={styles.calendarDate}>Feb 28</Text>
-          </View>
-          <View style={styles.calendarItems}>
-            <Text style={styles.calendarTitle}>Bear Browl</Text>
-            <Text style={styles.calendarDate}>Apr 30</Text>
-          </View>
+          {
+            userTournaments?.map((tourney: CalendarItemType) => {
+              return (
+                <CalendarItem key={tourney.id} name={tourney.tournament.name} date={tourney.tournament.date} />
+              );
+            })
+          }
         </ScrollView>
 
         <Text style={styles.label}>Quick Actions!!</Text>
@@ -90,12 +89,12 @@ export default function HomeScreen(props: HomeScreenProps) {
           <TouchableOpacity style={styles.button} onPress={() => setIsCalendarOpen(true)} >
             <Ionicons name="calendar-outline" size={24} color='#fff' />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => setIsFavoriteOpen(true)} >
+          {/* <TouchableOpacity style={styles.button} onPress={() => setIsFavoriteOpen(true)} >
             <Ionicons name="heart-outline" size={24} color='#fff' />
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => setIsTeamsOpen(true)} >
             <Ionicons name="people-outline" size={24} color='#fff' />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.button} onPress={() => setIsAddingOpen(true)} >
             <Ionicons name="add-circle-outline" size={24} color='#fff' />
           </TouchableOpacity>
@@ -106,10 +105,10 @@ export default function HomeScreen(props: HomeScreenProps) {
 
         <BottomSheetModal visible={isCaledarOpen} onClose={() => setIsCalendarOpen(false)}>
             <View style={styles.calendar}>
-                <MyCalendar events={calendarTest}/>
+                <MyCalendar events={userTournaments}/>
             </View>
         </BottomSheetModal>
-        <BottomSheetModal visible={isFavoriteOpen} onClose={() => setIsFavoriteOpen(false)}>
+        {/* <BottomSheetModal visible={isFavoriteOpen} onClose={() => setIsFavoriteOpen(false)}>
            <Text>
             Favorites!!
            </Text>
@@ -118,7 +117,7 @@ export default function HomeScreen(props: HomeScreenProps) {
             <Text>
               Teams!!
             </Text>
-        </BottomSheetModal>
+        </BottomSheetModal> */}
         <BottomSheetModal visible={isAddingOpen} onClose={() => setIsAddingOpen(false)}>
             <View style={styles.calendar}>
               <CreateTourney/>
@@ -201,27 +200,7 @@ const styles = StyleSheet.create({
     marginBottom:20,
     borderRadius: 10,
   },
-  calendarItems: {
-    backgroundColor: '#ababab4a',
-    width: 100,
-    height: 60,
-    borderRadius: 10,
-    marginRight: 5, 
-    marginLeft: 10,
-  },
-  calendarTitle: {
-    fontWeight: '700',
-    fontSize: 12,
-    marginTop: 3,
-    padding:8,
-    color: '#fff'
-  },
-  calendarDate: {
-    paddingLeft: 8,
-    fontWeight: '600',
-    color: '#ff5722'
-  },
-  quickActions: {
+quickActions: {
     flex: 1,
     width: '100%',
     height: 80,
