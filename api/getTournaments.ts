@@ -1,12 +1,11 @@
-import axios from 'axios';
-import { API_BASE_URL } from '@env';
+import axiosInstance from './axiosInstance';
 
 export interface Tournament {
-    id: number, 
+    id: number,
     name: string,
     date: string,
     location: string,
-    format: string, 
+    format: string,
     gender: string,
     level: string,
     status: string,
@@ -18,11 +17,10 @@ export interface Tournament {
 
 export default async function getTournaments(): Promise<Tournament[]> {
     try {
-        const response = await axios.get<Tournament[]>(`${API_BASE_URL}/tournaments/`);
+        const response = await axiosInstance.get<Tournament[]>('/tournaments/');
         return response.data;
-    } catch (error){
-        console.error('Error fetching local tournaments: ', error);
+    } catch (error) {
+        console.error('Error fetching tournaments:', error);
         return [];
     }
-
 }

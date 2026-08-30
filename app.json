@@ -1,34 +1,42 @@
 {
   "expo": {
-    "name": "native-app",
-    "slug": "native-app",
+    "name": "Volley-Hood",
+    "slug": "Volley-Hood",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/volleyhood-logo-map.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/volleyhood-logo-map.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.nativeapp"
+      "bundleIdentifier": "com.vollyehood.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Volley-Hood uses your location to show nearby courts and tournaments.",
+        "NSLocationAlwaysUsageDescription": "Volley-Hood uses your location to show nearby courts and tournaments."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/volleyhood-logo-map.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.nativeapp"
+      "package": "com.vollyehood.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-maps"
-    ]
+    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "bd8a4891-c282-4277-a90c-3fa1d1767da6"
+      }
+    }
   }
 }

@@ -1,16 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Tournament } from '../api/getTournaments'
 import { Ionicons } from "@expo/vector-icons";
-import { useUser } from '../contexts/UserContext';
-import { postTournamentRegistration } from '../api/postTournamentRegistration';
+import { generatePools } from '../api/generatePools';
+import RegisterTeamModal from './RegisterTeamModal';
 
 interface TournamentCardProps {
   tournament: Tournament;
 }
 
 export default function TournamentCard(props: TournamentCardProps) {
-  const { accessToken } = useUser();
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const handleStart = () => {
+    Alert.alert(
+      'Generate Pools',
+      `Start pool play for "${props.tournament.name}"? This will generate 2 pools from registered teams.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Generate',
+          onPress: async () => {
+            try {
+              await generatePools(props.tournament.id, 2);
+              Alert.alert('Success', 'Pools have been generated! Check the Teams tab.');
+            } catch (error: any) {
+              const msg = error?.response?.data?.detail ?? 'Failed to generate pools. Are you an admin?';
+              Alert.alert('Error', msg);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const getStatus = (status: string) => { 
     switch (status) {
@@ -59,9 +80,8 @@ export default function TournamentCard(props: TournamentCardProps) {
 
   const isRegistrationClosed = props.tournament.status === 'closed';
 
-  const submitRegistration = (tournamentId: number) => {
-    console.log("paco info", accessToken)
-    postTournamentRegistration(tournamentId, accessToken);
+  const submitRegistration = () => {
+    setShowRegisterModal(true);
   }
 
 
@@ -122,7 +142,7 @@ export default function TournamentCard(props: TournamentCardProps) {
               styles.registerButton,
               isRegistrationClosed && styles.disabledButton
           ]}
-          onPress={() => {submitRegistration(props.tournament.id)}}
+          onPress={submitRegistration}
           disabled={isRegistrationClosed}
           >
           <Text style={[
@@ -133,15 +153,22 @@ export default function TournamentCard(props: TournamentCardProps) {
           </Text>
           </TouchableOpacity>
           
-          {/* <TouchableOpacity
+          <TouchableOpacity
           style={styles.detailsButton}
-          onPress={() => {console.log("details function")}}
+          onPress={handleStart}
           >
-          <Text style={styles.detailsButtonText}>Details</Text>
-          </TouchableOpacity> */}
+          <Text style={styles.detailsButtonText}>Start 🏆</Text>
+          </TouchableOpacity>
       </View>
 
 
+      <RegisterTeamModal
+        visible={showRegisterModal}
+        tournamentId={props.tournament.id}
+        tournamentName={props.tournament.name}
+        onClose={() => setShowRegisterModal(false)}
+        onRegistered={() => Alert.alert('Registered!', 'Your team has been registered. Check the Teams tab.')}
+      />
     </View>
   );
 }

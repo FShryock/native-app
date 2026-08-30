@@ -1,7 +1,9 @@
 import React from "react";
 import { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
+import EditScoreModal from "./EditScoreModal";
 
 type match = {
     id: number,
@@ -15,45 +17,18 @@ type match = {
     showMultipleGames: boolean
 }
 
-export default function MatchCard() {
-    const [selectedTab, setSelectedTab] = useState('Live');
+interface MatchCardProps {
+    matches?: match[];
+    onScoreSaved?: () => void;
+}
+
+export default function MatchCard({ matches: propMatches, onScoreSaved }: MatchCardProps = {}) {
+    // const [selectedTab, setSelectedTab] = useState('Live');
     const [gameSelected, setGameSelected] = useState<Record<number, number>>({});
     const [selectedScore, setSelectedScore] = useState<Record<number, { t1: number; t2: number }>>({});
+    const [editingMatch, setEditingMatch] = useState<match | null>(null);
 
-    //test data
-    const matches = [
-        {
-        id: 1,
-        court: 'Court 3',
-        status: 'In Progress',
-        statusColor: '#22c55e',
-        team1: { name: 'Spike Squad', score: 21, game2Score: 15 },
-        team2: { name: 'Block Busters', score: 18, game2Score: 21 },
-        currentGame: 'Game 2',
-        games: ['Game 1', 'Game 2'],
-        },
-        {
-        id: 2,
-        court: 'Court 1',
-        status: 'Starting in 15min',
-        statusColor: '#fbbf24',
-        team1: { name: 'Net Ninjas', score: 6, game2Score: 0 },
-        team2: { name: 'Ace Attackers', score: 2, game2Score: 0},
-        currentGame: 'Game 1',
-        games: ['Game 1', 'Game 2'],
-        },
-        {
-        id: 3,
-        court: 'Court 2',
-        status: 'Final',
-        statusColor: '#6b7280',
-        team1: { name: 'Dig Dynasty', score: 25, game2Score: 19 },
-        team2: { name: 'Power Passers', score: 23, game2Score: 25 },
-        currentGame: 'Game 1',
-        games: ['Game 1', 'Game 2'],
-        showMultipleGames: true,
-        },
-    ];
+    const matches = propMatches;
 
     const handleSelectedGame = (match: match, id: number, index: number) => {
         setGameSelected(prev => ({...prev, [id]: index}));
@@ -83,7 +58,9 @@ export default function MatchCard() {
                 </View>
                 {/* <View style={[styles.statusBadge, { backgroundColor: match.statusColor}]}> */}
                 <View style={styles.statusBadge}>
-                    <Ionicons name={'create-outline'} size={25} color={'#fefeffff'} />
+                    <TouchableOpacity onPress={() => setEditingMatch(match)}>
+                        <Ionicons name={'create-outline'} size={25} color={'#fefeffff'} />
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -114,14 +91,14 @@ export default function MatchCard() {
                         key={game}
                         style={[
                             styles.gameTab,
-                            index === gameSelected[match.id] && styles.gameTabActive,
+                            index === (gameSelected[match.id] ?? 0) && styles.gameTabActive,
                         ]}
                         onPress={() => handleSelectedGame(match, match.id, index)}
                     >
                       <Text
                         style={[
                             styles.gameTabText,
-                            index === gameSelected[match.id] && styles.gameTabTextActive,
+                            index === (gameSelected[match.id] ?? 0) && styles.gameTabTextActive,
                         ]}
                       >
                         {game}
@@ -135,37 +112,34 @@ export default function MatchCard() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Tab navigation */}
-            <View style={styles.tabContainer}>
-                {['Live', 'Upcoming', 'Completed'].map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        style={[
-                            styles.tab,
-                            selectedTab === tab && styles.tabActive
-                        ]}
-                        onPress={() => setSelectedTab(tab)}
-                    >
-                        <Text
-                            style={[
-                                styles.tabText,
-                                selectedTab === tab && styles.tabTextActive
-                            ]}
-                        >
-                            {tab}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
             {/* Matches list */}
             <ScrollView
-                style={styles.scrollView}            
+                style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {matches.map((match) => renderMatchCard(match))}
+                {matches?.map((match) => renderMatchCard(match))}
             </ScrollView>
+
+            {editingMatch && (
+                <EditScoreModal
+                    visible={true}
+                    matchId={editingMatch.id}
+                    team1Name={editingMatch.team1.name}
+                    team2Name={editingMatch.team2.name}
+                    initialScores={{
+                        score_a_g1: editingMatch.team1.score,
+                        score_b_g1: editingMatch.team2.score,
+                        score_a_g2: editingMatch.team1.game2Score,
+                        score_b_g2: editingMatch.team2.game2Score,
+                    }}
+                    onClose={() => setEditingMatch(null)}
+                    onSaved={() => {
+                        setEditingMatch(null);
+                        onScoreSaved?.();
+                    }}
+                />
+            )}
         </SafeAreaView>
     )
 
@@ -232,8 +206,8 @@ const styles = StyleSheet.create({
     },
     statusText: {
         color: '#ffffff',
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '700',
     },
     scoreContainer: {
         flexDirection: 'row',

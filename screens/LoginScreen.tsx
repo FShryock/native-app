@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { getLogin } from '../api/getLogin';
-import logo from '../assets/logo.png';
+// import logo from '../assets/logo.png';
+import logo from '../assets/volleyhood-logo-map.png';
 import BottomSheetModal from '../components/BottomSheetModal';
 import SignUp from './SignUpScreen';
 import { useUser } from '../contexts/UserContext';
@@ -35,7 +36,7 @@ export default function LoginScreen(props: LoginScreenProps) {
       <View style={styles.mainScreen}>
       <Image source={logo} style={styles.logo} resizeMode={'contain'}/>
 
-      <Text style={styles.title}>Volley-Connect</Text>
+      <Text style={styles.title}>Volley-Hood</Text>
 
 
       {/* UserId */}
@@ -107,14 +108,14 @@ const styles = StyleSheet.create({
     padding: 20
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     marginBottom: 20
   },
   title: {
     fontSize: 28,
     fontWeight: 600,
-    color: '#ffeb3b',
+    color: '#f7f7f3',
     marginBottom: 20
   },
   input: {
@@ -167,7 +168,8 @@ const styles = StyleSheet.create({
     marginBottom: 14
   },
   signupLink: {
-    color: '#ffeb3b',
+    // color: '#ff5722',
+    color: '#673ab7',
     fontWeight: '800',
     fontSize: 18
   }

@@ -34,12 +34,12 @@ export default function HomeScreen(props: HomeScreenProps) {
     {title: 'Smackdown 3', start: '2025-10-25', info: 'This us a vert difficult tournament'},
   ];
 
-  const { userInfo, accessToken } = useUser();
+  const { userInfo } = useUser();
 
   useEffect(()=> {
     async function getUserTournaments() {
       try {
-        const data = await getMyTournaments(accessToken);
+        const data = await getMyTournaments();
         setUserTournaments(data);
       } catch (error: any) {
         console.error("Error: ", error)

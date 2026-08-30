@@ -1,4 +1,4 @@
-package com.anonymous.nativeapp
+package com.vollyehood.app
 
 import android.app.Application
 import android.content.res.Configuration
