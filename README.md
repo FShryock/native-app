@@ -1,6 +1,6 @@
-# 🏐 Volley-Connect
+# 🏐 VolleyHood
 
-Volley-Connect is a **React Native mobile app** with a **Django backend** that lets volleyball players log their games, track where they play, manage their player profile, and find Local tournaments (indoor, sand, grass).  
+VolleyHood is a **React Native mobile app** with a **Django backend** that lets volleyball players log their games, track where they play, manage their player profile, and find Local tournaments (indoor, sand, grass).  
 
 It’s a personal side project designed to showcase cross-platform mobile development, authentication, and backend integration.
 
