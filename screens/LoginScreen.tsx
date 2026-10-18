@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { getLogin } from '../api/getLogin';
-// import logo from '../assets/logo.png';
-import logo from '../assets/volleyhood-logo-map.png';
+import logo from '../assets/volleyhood-mark.png';
 import BottomSheetModal from '../components/BottomSheetModal';
 import SignUp from './SignUpScreen';
 import { useUser } from '../contexts/UserContext';

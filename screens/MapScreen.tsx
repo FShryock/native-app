@@ -10,7 +10,7 @@ export default function MapScreen() {
   useEffect(() => {
     (
       async() =>{
-        const {status} = await location.requestBackgroundPermissionsAsync();
+        const {status} = await location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission denied');
           return;

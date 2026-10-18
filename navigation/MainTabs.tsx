@@ -39,10 +39,10 @@ export default function MainTabs(props: MainTabsProps) {
         backgroundColor: '#181818',        // tab bar background color
         },
         headerShown: true,
-        headerTitle: "Volley-Connect",
+        headerTitle: "Volley-Hood",
         headerTitleAlign: "left",
         headerStyle: { backgroundColor: "#181818" },
-        headerTintColor: "#ff5722",
+        headerTintColor: "#fbf4f2",
         // Add your top-right buttons back
         headerRight: () => (
           <View style={{ flexDirection: "row", gap: 15, marginRight: 10 }}>

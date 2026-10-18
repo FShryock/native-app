@@ -4,18 +4,19 @@
     "slug": "Volley-Hood",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/volleyhood-logo-map.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/volleyhood-logo-map.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0E1322"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.vollyehood.app",
       "buildNumber": "1",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Volley-Hood uses your location to show nearby courts and tournaments.",
         "NSLocationAlwaysUsageDescription": "Volley-Hood uses your location to show nearby courts and tournaments."
@@ -23,8 +24,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/volleyhood-logo-map.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/volleyhood-Icons/android/adaptive-icon-monochrome-1024.png",
+        "backgroundColor": "#0E1322"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.vollyehood.app"
@@ -32,7 +34,13 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [],
+    "plugins": [
+      ["expo-splash-screen", {
+        "image": "./assets/volleyhood-Icons/splash/splash-icon-1024.png",
+        "imageWidth": 220,
+        "backgroundColor": "#0E1322"
+      }]
+    ],
     "extra": {
       "eas": {
         "projectId": "bd8a4891-c282-4277-a90c-3fa1d1767da6"
