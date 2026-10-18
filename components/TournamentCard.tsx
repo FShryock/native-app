@@ -21,10 +21,10 @@ export default function TournamentCard(props: TournamentCardProps) {
           text: 'Generate',
           onPress: async () => {
             try {
-              await generatePools(props.tournament.id, 2);
+              await generatePools(props.tournament.id);
               Alert.alert('Success', 'Pools have been generated! Check the Teams tab.');
             } catch (error: any) {
-              const msg = error?.response?.data?.detail ?? 'Failed to generate pools. Are you an admin?';
+              const msg = error?.response?.data?.message ?? error?.response?.data?.detail ?? 'Failed to generate pools. Are you an admin?';
               Alert.alert('Error', msg);
             }
           },

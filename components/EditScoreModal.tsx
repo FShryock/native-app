@@ -8,6 +8,7 @@ import { patchMatchScore } from '../api/patchMatchScore';
 interface EditScoreModalProps {
     visible: boolean;
     matchId: number;
+    version: number;
     team1Name: string;
     team2Name: string;
     initialScores: {
@@ -23,6 +24,7 @@ interface EditScoreModalProps {
 export default function EditScoreModal({
     visible,
     matchId,
+    version,
     team1Name,
     team2Name,
     initialScores,
@@ -41,6 +43,7 @@ export default function EditScoreModal({
             score_b_g1: parseInt(scoreB1) || 0,
             score_a_g2: parseInt(scoreA2) || 0,
             score_b_g2: parseInt(scoreB2) || 0,
+            version,
         };
 
         setSaving(true);
@@ -49,8 +52,13 @@ export default function EditScoreModal({
             onSaved();
             onClose();
         } catch (error: any) {
-            const msg = error?.response?.data?.detail ?? 'Failed to save scores.';
-            Alert.alert('Error', msg);
+            if (error?.response?.status === 409) {
+                const msg = error?.response?.data?.message ?? 'This match was updated by someone else. Close and reopen to see the latest scores.';
+                Alert.alert('Score Conflict', msg, [{ text: 'OK', onPress: onClose }]);
+            } else {
+                const msg = error?.response?.data?.detail ?? 'Failed to save scores.';
+                Alert.alert('Error', msg);
+            }
         } finally {
             setSaving(false);
         }

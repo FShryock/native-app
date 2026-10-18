@@ -13,6 +13,21 @@ import { CalendarItemType, poolMatch } from '../types';
 
 type TopTab = 'Pools' | 'My Matches' | 'My Pool';
 
+function formatScheduledTime(t: string): string {
+    const [h, min] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${String(min).padStart(2, '0')} ${ampm}`;
+}
+
+function courtLabel(m: { court_number: number | null; scheduled_time: string | null }, fallback: string): string {
+    if (m.court_number != null) {
+        const time = m.scheduled_time ? `, ${formatScheduledTime(m.scheduled_time)}` : '';
+        return `Court ${m.court_number}${time}`;
+    }
+    return fallback;
+}
+
 interface ActiveTournament {
     id: number;
     name: string;
@@ -154,7 +169,7 @@ export default function TeamScreen() {
 
         const adaptedMatches = myMatches.map((m) => ({
             id: m.id,
-            court: `Pool ${myPool.name}`,
+            court: courtLabel(m, `Pool ${myPool.name}`),
             status: m.is_complete ? 'Final' : 'In Progress',
             statusColor: m.is_complete ? '#e70f0f' : '#71ce1f',
             team1: { name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
@@ -162,6 +177,7 @@ export default function TeamScreen() {
             currentGame: 'Game 1',
             games: ['Game 1', 'Game 2'],
             showMultipleGames: false,
+            version: m.version,
         }));
 
         return (
@@ -211,7 +227,7 @@ export default function TeamScreen() {
             <MatchCard
                 matches={matches.map((m) => ({
                     id: m.id,
-                    court: `Pool ${m.pool}`,
+                    court: courtLabel(m, `Pool ${m.pool}`),
                     status: m.is_complete ? 'Final' : 'Upcoming',
                     statusColor: m.is_complete ? '#6b7280' : '#fbbf24',
                     team1: { name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
@@ -219,6 +235,7 @@ export default function TeamScreen() {
                     currentGame: 'Game 1',
                     games: ['Game 1', 'Game 2'],
                     showMultipleGames: false,
+                    version: m.version,
                 }))}
                 onScoreSaved={() => fetchPools(selectedTournamentId!)}
             />

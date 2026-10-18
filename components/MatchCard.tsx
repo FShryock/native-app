@@ -7,14 +7,15 @@ import EditScoreModal from "./EditScoreModal";
 
 type match = {
     id: number,
-    court: string, 
-    status: string, 
-    statusColor: string, 
+    court: string,
+    status: string,
+    statusColor: string,
     team1: { name: string, score: number, game2Score: number },
     team2: { name: string, score: number, game2Score: number },
     currentGame: string,
     games: Array<string>,
-    showMultipleGames: boolean
+    showMultipleGames: boolean,
+    version: number,
 }
 
 interface MatchCardProps {
@@ -125,6 +126,7 @@ export default function MatchCard({ matches: propMatches, onScoreSaved }: MatchC
                 <EditScoreModal
                     visible={true}
                     matchId={editingMatch.id}
+                    version={editingMatch.version}
                     team1Name={editingMatch.team1.name}
                     team2Name={editingMatch.team2.name}
                     initialScores={{

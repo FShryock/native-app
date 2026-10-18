@@ -5,6 +5,7 @@ export interface MatchScorePayload {
     score_b_g1: number;
     score_a_g2: number;
     score_b_g2: number;
+    version: number;
 }
 
 export async function patchMatchScore(matchId: number, payload: MatchScorePayload): Promise<void> {

@@ -21,6 +21,7 @@ export default function RegisterTeamModal({
     onRegistered,
 }: RegisterTeamModalProps) {
     const [teamName, setTeamName] = useState('');
+    const [clubName, setClubName] = useState('');
     const [saving, setSaving] = useState(false);
 
     const handleRegister = async () => {
@@ -32,7 +33,7 @@ export default function RegisterTeamModal({
 
         setSaving(true);
         try {
-            await postTournamentRegistration(tournamentId, trimmed);
+            await postTournamentRegistration(tournamentId, trimmed, clubName.trim() || undefined);
             setTeamName('');
             onRegistered();
             onClose();
@@ -46,6 +47,7 @@ export default function RegisterTeamModal({
 
     const handleClose = () => {
         setTeamName('');
+        setClubName('');
         onClose();
     };
 
@@ -69,6 +71,18 @@ export default function RegisterTeamModal({
                         onChangeText={setTeamName}
                         maxLength={50}
                         autoFocus
+                        returnKeyType="done"
+                        onSubmitEditing={handleRegister}
+                    />
+
+                    <Text style={styles.label}>Club / Organization <Text style={styles.optionalTag}>(optional)</Text></Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="e.g. Venice Beach Volleyball Club"
+                        placeholderTextColor="#6b7280"
+                        value={clubName}
+                        onChangeText={setClubName}
+                        maxLength={100}
                         returnKeyType="done"
                         onSubmitEditing={handleRegister}
                     />
@@ -126,6 +140,13 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 0.8,
+    },
+    optionalTag: {
+        color: '#6b7280',
+        fontSize: 11,
+        fontWeight: '400',
+        textTransform: 'none',
+        letterSpacing: 0,
     },
     input: {
         backgroundColor: '#1C1D21',

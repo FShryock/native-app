@@ -32,5 +32,8 @@ export type poolMatch = {
     team_a: number,
     team_a_name: string,
     team_b: number,
-    team_b_name: string
+    team_b_name: string,
+    version: number,
+    court_number: number | null,
+    scheduled_time: string | null,
 }
