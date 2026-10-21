@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from "@expo/vector-icons";
 import EditScoreModal from "./EditScoreModal";
+import { teamIcon } from '../utils/teamIcon';
 
 type match = {
     id: number,
     court: string,
     status: string,
     statusColor: string,
-    team1: { name: string, score: number, game2Score: number },
-    team2: { name: string, score: number, game2Score: number },
+    team1: { id: number, name: string, score: number, game2Score: number },
+    team2: { id: number, name: string, score: number, game2Score: number },
     currentGame: string,
     games: Array<string>,
     showMultipleGames: boolean,
@@ -24,12 +25,18 @@ interface MatchCardProps {
 }
 
 export default function MatchCard({ matches: propMatches, onScoreSaved }: MatchCardProps = {}) {
-    // const [selectedTab, setSelectedTab] = useState('Live');
     const [gameSelected, setGameSelected] = useState<Record<number, number>>({});
     const [selectedScore, setSelectedScore] = useState<Record<number, { t1: number; t2: number }>>({});
     const [editingMatch, setEditingMatch] = useState<match | null>(null);
 
     const matches = propMatches;
+
+    // Reset to Game 1 whenever the match list changes (e.g. after a score save + reload)
+    const matchKey = propMatches?.map(m => m.id).join(',') ?? '';
+    useEffect(() => {
+        setGameSelected({});
+        setSelectedScore({});
+    }, [matchKey]);
 
     const handleSelectedGame = (match: match, id: number, index: number) => {
         setGameSelected(prev => ({...prev, [id]: index}));
@@ -69,7 +76,9 @@ export default function MatchCard({ matches: propMatches, onScoreSaved }: MatchC
             <View style={styles.scoreContainer}>
                 {/* Team1 */}
                 <View style={styles.teamSection}>
-                    <View style={styles.shieldIcon}/>
+                    <View style={[styles.shieldIcon, { borderColor: teamIcon(match.team1.id).color }]}>
+                        <Ionicons name={teamIcon(match.team1.id).name as any} size={22} color={teamIcon(match.team1.id).color} />
+                    </View>
                     <Text style={styles.teamName}>{match.team1.name}</Text>
                 </View>
                 {/* Score Display */}
@@ -78,9 +87,11 @@ export default function MatchCard({ matches: propMatches, onScoreSaved }: MatchC
                     <Text style={styles.vsText}>vs</Text>
                     <Text style={styles.scoreText}>{displayT2}</Text>
                 </View>
-                 {/* Team2 */}
+                {/* Team2 */}
                 <View style={styles.teamSection}>
-                    <View style={styles.shieldIcon}/>
+                    <View style={[styles.shieldIcon, { borderColor: teamIcon(match.team2.id).color }]}>
+                        <Ionicons name={teamIcon(match.team2.id).name as any} size={22} color={teamIcon(match.team2.id).color} />
+                    </View>
                     <Text style={styles.teamName}>{match.team2.name}</Text>
                 </View>
             </View>
@@ -228,7 +239,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         marginBottom: 8,
         borderWidth: 2,
-        borderColor: '#1C1D21',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     teamName: {
         color: '#ffffff',

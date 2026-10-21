@@ -21,6 +21,20 @@ export type Tournament = {
     teams_limit: number
 }
 
+export type BracketMatch = {
+    id: number,
+    round: number,
+    position: number,
+    team_a: number | null,
+    team_a_name: string | null,
+    team_b: number | null,
+    team_b_name: string | null,
+    score_a: number | null,
+    score_b: number | null,
+    winner: number | null,
+    version: number,
+}
+
 export type poolMatch = {
     id: number,
     is_complete: boolean,

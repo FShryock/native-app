@@ -8,10 +8,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useUser } from '../contexts/UserContext';
 import { getPools, Pool } from '../api/getPools';
 import { getMyTournaments } from '../api/getMyTournaments';
+import { getBracket } from '../api/getBracket';
 import MatchCard from '../components/MatchCard';
-import { CalendarItemType, poolMatch } from '../types';
+import BracketMatchCard from '../components/BracketMatchCard';
+import { CalendarItemType, poolMatch, BracketMatch } from '../types';
 
-type TopTab = 'Pools' | 'My Matches' | 'My Pool';
+type TopTab = 'Pools' | 'My Matches' | 'My Pool' | 'Bracket';
 
 function formatScheduledTime(t: string): string {
     const [h, min] = t.split(':').map(Number);
@@ -47,6 +49,11 @@ export default function TeamScreen() {
     const [loading, setLoading] = useState(false);
     const [matches, setMatches] = useState<poolMatch[]>([]);
 
+    // Bracket state
+    const [bracketMatches, setBracketMatches] = useState<BracketMatch[]>([]);
+    const [bracketRound, setBracketRound] = useState(1);
+    const [bracketLoading, setBracketLoading] = useState(false);
+
     useEffect(() => {
         findActiveTournaments();
     }, []);
@@ -57,6 +64,13 @@ export default function TeamScreen() {
             fetchPools(selectedTournamentId);
         }
     }, [selectedTournamentId]);
+
+    // Lazy-load bracket when that tab is opened
+    useEffect(() => {
+        if (activeTab === 'Bracket' && selectedTournamentId !== null && bracketMatches.length === 0 && !bracketLoading) {
+            fetchBracket(selectedTournamentId);
+        }
+    }, [activeTab, selectedTournamentId]);
 
     async function findActiveTournaments() {
         setDiscovering(true);
@@ -107,6 +121,19 @@ export default function TeamScreen() {
             // pools unavailable
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function fetchBracket(tournamentId: number) {
+        setBracketLoading(true);
+        try {
+            const data = await getBracket(tournamentId);
+            setBracketMatches(data);
+            if (data.length > 0) setBracketRound(1);
+        } catch {
+            setBracketMatches([]);
+        } finally {
+            setBracketLoading(false);
         }
     }
 
@@ -172,8 +199,8 @@ export default function TeamScreen() {
             court: courtLabel(m, `Pool ${myPool.name}`),
             status: m.is_complete ? 'Final' : 'In Progress',
             statusColor: m.is_complete ? '#e70f0f' : '#71ce1f',
-            team1: { name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
-            team2: { name: m.team_b_name || `Team ${m.team_b}`, score: m.score_b_g1 ?? 0, game2Score: m.score_b_g2 ?? 0 },
+            team1: { id: m.team_a, name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
+            team2: { id: m.team_b, name: m.team_b_name || `Team ${m.team_b}`, score: m.score_b_g1 ?? 0, game2Score: m.score_b_g2 ?? 0 },
             currentGame: 'Game 1',
             games: ['Game 1', 'Game 2'],
             showMultipleGames: false,
@@ -230,8 +257,8 @@ export default function TeamScreen() {
                     court: courtLabel(m, `Pool ${m.pool}`),
                     status: m.is_complete ? 'Final' : 'Upcoming',
                     statusColor: m.is_complete ? '#6b7280' : '#fbbf24',
-                    team1: { name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
-                    team2: { name: m.team_b_name || `Team ${m.team_b}`, score: m.score_b_g1 ?? 0, game2Score: m.score_b_g2 ?? 0 },
+                    team1: { id: m.team_a, name: m.team_a_name || `Team ${m.team_a}`, score: m.score_a_g1 ?? 0, game2Score: m.score_a_g2 ?? 0 },
+                    team2: { id: m.team_b, name: m.team_b_name || `Team ${m.team_b}`, score: m.score_b_g1 ?? 0, game2Score: m.score_b_g2 ?? 0 },
                     currentGame: 'Game 1',
                     games: ['Game 1', 'Game 2'],
                     showMultipleGames: false,
@@ -242,11 +269,78 @@ export default function TeamScreen() {
         );
     };
 
+    const renderBracket = () => {
+        if (bracketLoading) return <ActivityIndicator size="large" color="#ff5722" style={{ marginTop: 30 }} />;
+
+        if (bracketMatches.length === 0) {
+            return (
+                <View style={styles.emptyState}>
+                    <Ionicons name="git-branch-outline" size={48} color="#9ca3af" />
+                    <Text style={styles.emptyText}>No bracket yet.{'\n'}Check back after pool play is complete.</Text>
+                </View>
+            );
+        }
+
+        const rounds = [...new Set(bracketMatches.map(m => m.round))].sort((a, b) => a - b);
+        const totalRounds = rounds.length;
+
+        const getRoundName = (round: number): string => {
+            const fromEnd = totalRounds - rounds.indexOf(round);
+            if (fromEnd === 1) return 'Final';
+            if (fromEnd === 2) return 'Semis';
+            if (fromEnd === 3) return 'Quarters';
+            return `Round ${round}`;
+        };
+
+        const roundMatches = bracketMatches
+            .filter(m => m.round === bracketRound)
+            .sort((a, b) => a.position - b.position);
+
+        return (
+            <View style={{ flex: 1 }}>
+                {/* Round tabs */}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.roundTabRow}
+                >
+                    {rounds.map(round => (
+                        <TouchableOpacity
+                            key={round}
+                            style={[styles.roundTab, bracketRound === round && styles.roundTabActive]}
+                            onPress={() => setBracketRound(round)}
+                        >
+                            <Text style={[styles.roundTabText, bracketRound === round && styles.roundTabTextActive]}>
+                                {getRoundName(round)}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                {/* Matches for selected round */}
+                <ScrollView
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {roundMatches.map((match, idx) => (
+                        <BracketMatchCard
+                            key={match.id}
+                            match={match}
+                            matchLabel={`Match ${idx + 1}`}
+                            onScoreSaved={() => fetchBracket(selectedTournamentId!)}
+                        />
+                    ))}
+                </ScrollView>
+            </View>
+        );
+    };
+
     // ── Loading / empty states ────────────────────────────────────────────────
 
     if (discovering) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
                 <ActivityIndicator size="large" color="#ff5722" style={{ marginTop: 60 }} />
                 <Text style={styles.discoveringText}>Looking for active tournaments…</Text>
             </SafeAreaView>
@@ -255,7 +349,7 @@ export default function TeamScreen() {
 
     if (activeTournaments.length === 0) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
                 <View style={styles.emptyState}>
                     <Ionicons name="trophy-outline" size={48} color="#9ca3af" />
                     <Text style={styles.emptyText}>No active tournaments yet.{'\n'}Check back after the admin starts pool play.</Text>
@@ -267,13 +361,18 @@ export default function TeamScreen() {
     // ── Main view ─────────────────────────────────────────────────────────────
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
             {/* Tournament picker — only shown when 2+ active */}
             {activeTournaments.length > 1 && renderTournamentPicker()}
 
             {/* Top Tabs */}
-            <View style={styles.tabContainer}>
-                {(['Pools', 'My Matches', 'My Pool'] as TopTab[]).map((tab) => (
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.tabScrollView}
+                contentContainerStyle={styles.tabContainer}
+            >
+                {(['Pools', 'My Matches', 'My Pool', 'Bracket'] as TopTab[]).map((tab) => (
                     <TouchableOpacity
                         key={tab}
                         style={[styles.tab, activeTab === tab && styles.tabActive]}
@@ -284,11 +383,12 @@ export default function TeamScreen() {
                         </Text>
                     </TouchableOpacity>
                 ))}
-            </View>
+            </ScrollView>
 
             {activeTab === 'Pools' && renderPools()}
             {activeTab === 'My Matches' && renderMyMatches()}
             {activeTab === 'My Pool' && renderMyPool()}
+            {activeTab === 'Bracket' && renderBracket()}
         </SafeAreaView>
     );
 }
@@ -335,11 +435,14 @@ const styles = StyleSheet.create({
     pickerChipTextActive: {
         color: '#ffffff',
     },
+    tabScrollView: {
+        flexGrow: 0,
+    },
     tabContainer: {
         flexDirection: 'row',
         paddingHorizontal: 16,
         paddingTop: 16,
-        paddingBottom: 8,
+        paddingBottom: 4,
         gap: 12,
     },
     tab: {
@@ -405,6 +508,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 8,
+    },
+    roundTabRow: {
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        gap: 8,
+    },
+    roundTab: {
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: '#93939363',
+    },
+    roundTabActive: {
+        backgroundColor: '#ff5722',
+    },
+    roundTabText: {
+        color: '#f7f7f7',
+        fontSize: 13,
+        fontWeight: '600',
+    },
+    roundTabTextActive: {
+        color: '#ffffff',
     },
     emptyState: {
         flex: 1,
